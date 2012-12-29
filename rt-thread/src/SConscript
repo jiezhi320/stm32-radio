@@ -1,8 +1,0 @@
-Import('RTT_ROOT')
-from building import *
-
-src     = Glob('*.c')
-CPPPATH = [RTT_ROOT + '/include']
-group   = DefineGroup('Kernel', src, depend = [''], CPPPATH = CPPPATH)
-
-Return('group')
