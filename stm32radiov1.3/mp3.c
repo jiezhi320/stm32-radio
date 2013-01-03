@@ -714,7 +714,7 @@ void douban_radio(const char* channel, const char* station)
 	is_playing = RT_TRUE;
 
 	player_notify_info("¡¨Ω”∂π∞Í÷–...");
-	douban = douban_radio_open(channel[9] - '0');
+	douban = douban_radio_open(channel[9]);
 	if (douban != RT_NULL)
 	{
 		player_set_title(station);

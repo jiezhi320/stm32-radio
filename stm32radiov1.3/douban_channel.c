@@ -11,6 +11,7 @@ static void function_return(struct rtgui_widget* widget, void *paramter);
 
 static const struct rtgui_list_item channel_list[] =
 {
+	{"∂π∞Í-ÀÊ“‚≤•∑≈",RT_NULL,function_douban, (void*)0}, 
     {"∂π∞Íº◊ø«≥Ê - ª™”ÔMhz", RT_NULL, function_douban, (void*)1},
     {"∂π∞Í≈∑√¿MHz", RT_NULL, function_douban, (void*)2},
     {"∂π∞Í“°πˆMHz", RT_NULL, function_douban, (void*)7},
@@ -19,7 +20,35 @@ static const struct rtgui_list_item channel_list[] =
     {"∂π∞Í«·“Ù¿÷MHz", RT_NULL, function_douban, (void*)9},
     {"∂π∞Í70ƒÍMHz", RT_NULL, function_douban, (void*)3},
     {"∂π∞Í80ƒÍMHz", RT_NULL, function_douban, (void*)4},
+    {"∑µªÿ…œº∂", RT_NULL, function_return, RT_NULL },
+
     {"∂π∞Í90ƒÍMHz", RT_NULL, function_douban, (void*)5},
+
+    {"∂π∞Í-µÁ”∞‘≠…˘", RT_NULL, function_douban, (void*)10},
+    {"∂π∞Í-æÙ ø", RT_NULL, function_douban, (void*)13},
+    {"∂π∞Í-µÁ◊”", RT_NULL, function_douban, (void*)14},
+    {"∂π∞Í-Àµ≥™", RT_NULL, function_douban, (void*)15},
+    {"∂π∞Í-R&B", RT_NULL, function_douban, (void*)16},
+    {"∂π∞Í-»’”Ô", RT_NULL, function_douban, (void*)17},
+    {"∂π∞Í-∫´”Ô", RT_NULL, function_douban, (void*)18},
+    {"∂π∞Í-≈Æ…˘", RT_NULL, function_douban, (void*)20},
+    {"∑µªÿ…œº∂", RT_NULL, function_return, RT_NULL },
+	
+    {"∂π∞Í-∑®”Ô", RT_NULL, function_douban, (void*)22},
+
+    {"∂π∞Í23", RT_NULL, function_douban, (void*)23},
+    {"∂π∞Í-“Ù¿÷»À", RT_NULL, function_douban, (void*)26},
+    {"∂π∞Í-π≈µ‰", RT_NULL, function_douban, (void*)27},
+    {"∂π∞Í-∂Ø¬˛", RT_NULL, function_douban, (void*)28},
+    {"∂π∞Í29", RT_NULL, function_douban, (void*)29},
+    {"∂π∞Í-øß∑»", RT_NULL, function_douban, (void*)32},
+    {"∂π∞Í33", RT_NULL, function_douban, (void*)33},
+    {"∂π∞Í35", RT_NULL, function_douban, (void*)35},
+	{"∑µªÿ…œº∂", RT_NULL, function_return, RT_NULL },
+	   
+    {"∂π∞Í42", RT_NULL, function_douban, (void*)42},
+    {"∂π∞Í-≥« –‘√––", RT_NULL, function_douban, (void*)43},	
+	
     {"∑µªÿ…œº∂", RT_NULL, function_return, RT_NULL },
 };
 
@@ -31,7 +60,7 @@ static void function_douban(struct rtgui_widget* widget, void *parameter)
 	channel = (int)parameter;
 
 	rt_kprintf("douban channel %d\n", channel);
-	rt_snprintf(channel_url, sizeof(channel_url), "douban://%d", channel);
+	rt_snprintf(channel_url, sizeof(channel_url), "douban://%c", channel);
 
 	play_list_clear();
 	play_list_append_radio(channel_url, 

@@ -64,4 +64,10 @@ void player_set_buffer_status(rt_bool_t buffering);
 /* get playing mode */
 enum PLAYER_MODE player_get_mode(void);
 
+
+#define RADIO_FN                    "/radio.pls"
+#define RADIO_LIST_UPDATE_URL       "http://www.rt-thread.org/radio/radio.pls"
+//#define RADIO_LIST_UPDATE_URL       "http://www.aozima.com/radio/radio.pls"
+
+
 #endif

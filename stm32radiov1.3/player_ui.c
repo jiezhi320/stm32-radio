@@ -27,7 +27,7 @@
 #include "play.hdh"
 #include "stop.hdh"
 
-#define RADIO_FN    "/resource/radio.pls"
+
 #define MP3_FN      "/"
 
 #include "board.h"

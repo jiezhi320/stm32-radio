@@ -14,7 +14,7 @@
 
 #include "http.h"
 #include "player_bg.h"
-
+#include "player_ui.h"
 /* */
 #define RADIO_FN                    "/radio.pls"
 #define RADIO_LIST_UPDATE_URL       "http://www.rt-thread.org/radio/radio.pls"
