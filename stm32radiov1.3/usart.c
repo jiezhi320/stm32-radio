@@ -62,7 +62,7 @@ struct stm32_serial_device uart3 =
 {
 	USART3,
 	&uart3_int_rx,
-	RT_NULL
+	&uart3_dma_tx
 };
 struct rt_device uart3_device;
 #endif
@@ -132,6 +132,9 @@ static void RCC_Configuration(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	/* Enable USART3 clock */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+
+	/* DMA clock enable */
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 #endif
 }
 
@@ -186,7 +189,8 @@ static void NVIC_Configuration(void)
 #ifdef RT_USING_UART1
 	/* Enable the USART1 Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 #endif
@@ -194,6 +198,7 @@ static void NVIC_Configuration(void)
 #ifdef RT_USING_UART2
 	/* Enable the USART2 Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
@@ -202,6 +207,14 @@ static void NVIC_Configuration(void)
 #ifdef RT_USING_UART3
 	/* Enable the USART3 Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* Enable the DMA1 Channel2 Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
@@ -210,6 +223,7 @@ static void NVIC_Configuration(void)
 
 static void DMA_Configuration(void)
 {
+#if defined (RT_USING_UART3)
 	DMA_InitTypeDef DMA_InitStructure;
 
 	/* fill init structure */
@@ -221,14 +235,20 @@ static void DMA_Configuration(void)
 	DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;
 	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
 
-	/* DMA1 Channel4 (triggered by USART1 Tx event) Config */
-	DMA_DeInit(UART1_TX_DMA);
-	DMA_InitStructure.DMA_PeripheralBaseAddr = USART1_DR_Base;
+	/* DMA1 Channel5 (triggered by USART3 Tx event) Config */
+	DMA_DeInit(UART3_TX_DMA);
+	DMA_InitStructure.DMA_PeripheralBaseAddr = USART3_DR_Base;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
+	/* As we will set them before DMA actually enabled, the DMA_MemoryBaseAddr
+	 * and DMA_BufferSize are meaningless. So just set them to proper values
+	 * which could make DMA_Init happy.
+	 */
 	DMA_InitStructure.DMA_MemoryBaseAddr = (u32)0;
-	DMA_InitStructure.DMA_BufferSize = 0;
-	DMA_Init(UART1_TX_DMA, &DMA_InitStructure);
-	DMA_ClearFlag(DMA1_FLAG_TC4);
+	DMA_InitStructure.DMA_BufferSize = 1;
+	DMA_Init(UART3_TX_DMA, &DMA_InitStructure);
+	DMA_ITConfig(UART3_TX_DMA, DMA_IT_TC | DMA_IT_TE, ENABLE);
+	DMA_ClearFlag(DMA1_FLAG_TC2);
+#endif
 }
 
 /*
@@ -246,6 +266,8 @@ void rt_hw_usart_init()
 
 	NVIC_Configuration();
 
+	DMA_Configuration();
+
 	/* uart init */
 #ifdef RT_USING_UART1
 	USART_InitStructure.USART_BaudRate = 115200;
@@ -260,8 +282,6 @@ void rt_hw_usart_init()
 	USART_ClockInitStructure.USART_LastBit = USART_LastBit_Disable;
 	USART_Init(USART1, &USART_InitStructure);
 	USART_ClockInit(USART1, &USART_ClockInitStructure);
-
-	DMA_Configuration();
 
 	/* register uart1 */
 	rt_hw_serial_register(&uart1_device, "uart1",
@@ -309,10 +329,15 @@ void rt_hw_usart_init()
 	USART_Init(USART3, &USART_InitStructure);
 	USART_ClockInit(USART3, &USART_ClockInitStructure);
 
+	uart3_dma_tx.dma_channel= UART3_TX_DMA;
+
 	/* register uart3 */
 	rt_hw_serial_register(&uart3_device, "uart3",
-		RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX | RT_DEVICE_FLAG_STREAM,
+		RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX | RT_DEVICE_FLAG_DMA_TX,
 		&uart3);
+
+	/* Enable USART3 DMA Tx request */
+	USART_DMACmd(USART3, USART_DMAReq_Tx , ENABLE);
 
 	/* enable interrupt */
 	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
