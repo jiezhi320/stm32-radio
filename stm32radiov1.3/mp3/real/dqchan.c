@@ -245,7 +245,7 @@ int DequantChannel(int *sampleBuf, int *workBuf, int *nonZeroBound, FrameHeader 
 					ScaleFactorInfoSub *sfis, CriticalBandInfo *cbi)
 {
 	int i, j, w, cb;
-	volatile int cbStartL, cbEndL, cbStartS, cbEndS;
+	int cbStartL, cbEndL, cbStartS, cbEndS;
 	int nSamps, nonZero, sfactMultiplier, gbMask;
 	int globalGain, gainI;
 	int cbMax[3];

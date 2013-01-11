@@ -44,7 +44,7 @@
 
 #include "coder.h"
 #include "assembly.h"
-#include "stm32f10x_gpio.h"
+
 /**************************************************************************************
  * Function:    Subband
  *
@@ -60,7 +60,7 @@
 int Subband(MP3DecInfo *mp3DecInfo, short *pcmBuf)
 {
 	int b;
-	HuffmanInfo * volatile hi;
+	HuffmanInfo *hi;
 	IMDCTInfo *mi;
 	SubbandInfo *sbi;
 
@@ -77,15 +77,9 @@ int Subband(MP3DecInfo *mp3DecInfo, short *pcmBuf)
 		for (b = 0; b < BLOCK_SIZE; b++) {
 			FDCT32(mi->outBuf[0][b], sbi->vbuf + 0*32, sbi->vindex, (b & 0x01), mi->gb[0]);
 			FDCT32(mi->outBuf[1][b], sbi->vbuf + 1*32, sbi->vindex, (b & 0x01), mi->gb[1]);
-			PolyphaseMono(pcmBuf, sbi->vbuf + sbi->vindex + VBUF_LENGTH * (b & 0x01), polyCoef);
-			sbi->vindex = (sbi->vindex - (b & 0x01)) & 7;
-			pcmBuf += (2 * NBANDS);
-			/*the normal code*/
-		/*	FDCT32(mi->outBuf[0][b], sbi->vbuf + 0*32, sbi->vindex, (b & 0x01), mi->gb[0]);
-			FDCT32(mi->outBuf[1][b], sbi->vbuf + 1*32, sbi->vindex, (b & 0x01), mi->gb[1]);
 			PolyphaseStereo(pcmBuf, sbi->vbuf + sbi->vindex + VBUF_LENGTH * (b & 0x01), polyCoef);
 			sbi->vindex = (sbi->vindex - (b & 0x01)) & 7;
-			pcmBuf += (2 * NBANDS);*/
+			pcmBuf += (2 * NBANDS);
 		}
 	} else {
 		/* mono */

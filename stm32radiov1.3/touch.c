@@ -11,7 +11,8 @@
 #include <rtgui/rtgui_server.h>
 #include <rtgui/rtgui_system.h>
 
-
+#define X_WIDTH 240
+#define Y_WIDTH 320
 
 rt_inline void EXTI_Enable(rt_uint32_t enable);
 
@@ -131,8 +132,7 @@ __inline u16 TPReadY(void)
    return (y);
 }
 
-#define X_WIDTH 240
-#define Y_WIDTH 320
+
 
 static void rtgui_touch_calculate()
 {
@@ -146,12 +146,10 @@ static void rtgui_touch_calculate()
 
             for(i=0; i<10; i++)
             {
-                
-                                            /* read X */
+                /* read X */
                 tmpy[i] = TPReadX();                      
               
                 tmpx[i] = TPReadY();                       
-                
             }
 
             //去最高值与最低值,再取平均值
@@ -348,7 +346,7 @@ rt_inline void EXTI_Enable(rt_uint32_t enable)
 
 static void EXTI_Configuration(void)
 {
-    /* PB1 touch INT */
+    /* PC0 touch INT */
     {
         GPIO_InitTypeDef GPIO_InitStructure;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);

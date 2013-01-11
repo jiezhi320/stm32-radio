@@ -132,7 +132,7 @@ static void player_update_tag_info()
     RTGUI_DC_FC(dc) = black;
     if (player_mode == PLAYER_STOP)
     {
-        rt_snprintf(line, sizeof(line), "    网络收音机");
+        rt_snprintf(line, sizeof(line), "      网络收音机");
         rtgui_dc_draw_text(dc, line, &rect);
     }
     else

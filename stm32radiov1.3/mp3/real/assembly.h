@@ -219,37 +219,15 @@ static __inline int CLZ(int x)
 
 #elif defined ARM_ADS
 
-static __inline int MULSHIFT32(int x, int y)
-{
-    /* important rules for smull RdLo, RdHi, Rm, Rs:
-     *     RdHi and Rm can't be the same register
-     *     RdLo and Rm can't be the same register
-     *     RdHi and RdLo can't be the same register
-     * Note: Rs determines early termination (leading sign bits) so if you want to specify
-     *   which operand is Rs, put it in the SECOND argument (y)
-	 * For inline assembly, x and y are not assumed to be R0, R1 so it shouldn't matter
-	 *   which one is returned. (If this were a function call, returning y (R1) would 
-	 *   require an extra "mov r0, r1")
-     */
-    int zlow;
-    __asm {
-    	smull zlow,y,x,y
-   	}
+typedef long long Word64;
 
-    return y;
-}
+#define MULSHIFT32	xmp3_MULSHIFT32
+extern int MULSHIFT32(int x, int y);
 
-static __inline int FASTABS(int x) 
-{
-	int t=0; /*Really is not necessary to initialiaze only to avoid warning*/
 
-	__asm {
-		eor	t, x, x, asr #31  // T:=X XOR (X>>31)
-		sub	t, t, x, asr #31  // T:=T-(X>>31)
-	}
+#define FASTABS	xmp3_FASTABS
+int FASTABS(int x);
 
-	return t;
-}
 
 static __inline int CLZ(int x)
 {

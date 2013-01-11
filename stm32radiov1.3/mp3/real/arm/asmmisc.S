@@ -35,16 +35,35 @@
 
 
 	AREA	|.text|, CODE, READONLY
+	THUMB
+	REQUIRE8
+	PRESERVE8
 ; int xmp3_MULSHIFT32(int x, int y)
-	EXPORT	xmp3_MULSHIFT32
-
-xmp3_MULSHIFT32
-	smull	r2, r0, r1, r0
-	;mov		pc, lr
-	BX LR
+	EXPORT xmp3_MULSHIFT32
 	EXPORT xmp3_FASTABS
-xmp3_FASTABS
-	;mov		pc, lr
-	BX LR
 
+;.cpu cortex-m3
+;.fpu softvfp   
+;.syntax unified 
+;.thumb
+;.text
+
+    ; .global xmp3_MULSHIFT32
+    ; .thumb_func
+xmp3_MULSHIFT32 PROC
+	smull	r2, r0, r1, r0
+;	mov		pc, lr	  // KJ changed to BX for Cortex
+	BX lr
+	ENDP
+
+	;.global	xmp3_FASTABS
+    ;.thumb_func
+xmp3_FASTABS PROC
+	mov r1, r0
+	mov r0, #0x0
+	eor r0, r1, r1, asr # 31
+	sub r0, r0, r1, asr # 31
+	bx lr
+	ENDP
+	
 	END

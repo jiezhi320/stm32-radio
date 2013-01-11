@@ -109,7 +109,7 @@ static __inline short ClipToShort(int x, int fracBits)
  * TODO:        add 32-bit version for platforms where 64-bit mul-acc is not supported
  *                (note max filter gain - see polyCoef[] comments)
  **************************************************************************************/
-static void PolyphaseMono(short *pcm, int *vbuf, const int *coefBase)
+void PolyphaseMono(short *pcm, int *vbuf, const int *coefBase)
 {	
 	int i;
 	const int *coef;
@@ -222,7 +222,7 @@ static void PolyphaseMono(short *pcm, int *vbuf, const int *coefBase)
  *
  * TODO:        add 32-bit version for platforms where 64-bit mul-acc is not supported
  **************************************************************************************/
-static void PolyphaseStereo(short *pcm, int *vbuf, const int *coefBase)
+void PolyphaseStereo(short *pcm, int *vbuf, const int *coefBase)
 {
 	int i;
 	const int *coef;

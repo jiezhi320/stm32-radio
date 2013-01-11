@@ -208,8 +208,7 @@ static const char NRTab[6][3][4] = {
 static void UnpackSFMPEG2(BitStreamInfo *bsi, SideInfoSub *sis, ScaleFactorInfoSub *sfis, int gr, int ch, int modeExt, ScaleFactorJS *sfjs)
 {
 
-	int i, sfb, sfcIdx, btIdx, nrIdx;
-	volatile int iipTest;
+	int i, sfb, sfcIdx, btIdx, nrIdx, iipTest;
 	int slen[4], nr[4];
 	int sfCompress, preFlag, intensityScale;
 	

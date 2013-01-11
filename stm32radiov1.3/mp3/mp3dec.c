@@ -44,7 +44,7 @@
 #include "string.h" // J.Sz. 21/04/2006
 // #include "hlxclib/string.h"		/* for memmove, memcpy (can replace with different implementations if desired) */
 #include "mp3common.h"	/* includes mp3dec.h (public API) and internal, platform-independent API */
-#include "stm32f10x_gpio.h"
+
 /**************************************************************************************
  * Function:    MP3InitDecoder
  *
@@ -247,13 +247,13 @@ int MP3GetNextFrameInfo(HMP3Decoder hMP3Decoder, MP3FrameInfo *mp3FrameInfo, uns
  **************************************************************************************/
 static void MP3ClearBadFrame(MP3DecInfo *mp3DecInfo, short *outbuf)
 {
-	/*int i;
+	int i;
 
 	if (!mp3DecInfo)
 		return;
 
 	for (i = 0; i < mp3DecInfo->nGrans * mp3DecInfo->nGranSamps * mp3DecInfo->nChans; i++)
-		outbuf[i] = 0;*/
+		outbuf[i] = 0;
 }
 
 /**************************************************************************************

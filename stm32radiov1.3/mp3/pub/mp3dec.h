@@ -45,9 +45,9 @@
 #define _MP3DEC_H
 
 // Must be moved KJ
-#define __GNUC__
+//#define __GNUC__
 #define ARM
-
+#define ARM_ADS
 
 #if defined(_WIN32) && !defined(_WIN32_WCE)
 #

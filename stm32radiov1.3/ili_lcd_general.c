@@ -36,7 +36,17 @@ static void LCD_FSMCConfig(void)
     FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
     FSMC_NORSRAMTimingInitTypeDef  Timing_read,Timing_write;
 
+
+#if 1	
     /*-- FSMC Configuration -------------------------------------------------*/
+	Timing_read.FSMC_AddressSetupTime = 0x00;	 //地址建立时间（ADDSET）为1个HCLK  
+    Timing_read.FSMC_AddressHoldTime = 0x00;	 //地址保持时间（A		
+    Timing_read.FSMC_DataSetupTime = 0x03;		 ////数据保存时间为4个HCLK	
+    Timing_read.FSMC_BusTurnAroundDuration = 0x00;
+    Timing_read.FSMC_CLKDivision = 0x00;
+    Timing_read.FSMC_DataLatency = 0x00;
+    Timing_read.FSMC_AccessMode = FSMC_AccessMode_A;	 //模式A 
+#else	
     Timing_read.FSMC_AddressSetupTime = 3;             /* 地址建立时间  */
     Timing_read.FSMC_DataSetupTime = 4;                /* 数据建立时间  */
     Timing_read.FSMC_AccessMode = FSMC_AccessMode_A;    /* FSMC 访问模式 */
@@ -44,7 +54,7 @@ static void LCD_FSMCConfig(void)
     Timing_write.FSMC_AddressSetupTime = 2;             /* 地址建立时间  */
     Timing_write.FSMC_DataSetupTime = 3;                /* 数据建立时间  */
     Timing_write.FSMC_AccessMode = FSMC_AccessMode_A;   /* FSMC 访问模式 */
-
+#endif	
     /* Color LCD configuration ------------------------------------
        LCD configured as follow:
           - Data/Address MUX = Disable
@@ -187,6 +197,7 @@ static void lcd_data_bus_test(void)
         (deviceid ==0x9325)
         || (deviceid ==0x9328)
         || (deviceid ==0x9320)
+	    || (deviceid ==0x1505)
     )
     {
         temp1 = BGR2RGB( lcd_read_gram(0,0) );
@@ -235,6 +246,7 @@ static void lcd_gram_test(void)
         (deviceid ==0x9320)
         || (deviceid ==0x9325)
         || (deviceid ==0x9328)
+	    || (deviceid ==0x1505)
     )
     {
         for(test_y=0; test_y<320; test_y++)
@@ -272,6 +284,10 @@ static void lcd_gram_test(void)
 void lcd_Initializtion(void)
 {
     lcd_port_init();
+	
+	delay(50); 
+	write_reg(0x0000,0x0001);
+	delay(50); 
     deviceid = read_reg(0x00);
 
     /* deviceid check */
@@ -282,9 +298,10 @@ void lcd_Initializtion(void)
         && (deviceid != 0x9325)
         && (deviceid != 0x9328)
         && (deviceid != 0x9300)
+		&& (deviceid != 0x1505)
     )
     {
-        printf("Invalid LCD ID:%08X\r\n",deviceid);
+        printf("Invalid LCD ID:%08X\r\n!!",deviceid);
         printf("Please check you hardware and configure.");
         //while(1);
 		return ;
@@ -545,7 +562,82 @@ void lcd_Initializtion(void)
         write_reg(0x0007,0x0133);
         delay(20);
     }
-
+    else if( deviceid ==0x1505)
+    {
+		// second release on 3/5  ,luminance is acceptable,water wave appear during camera preview
+        write_reg(0x0007,0x0000);
+        delay(50); 
+        write_reg(0x0012,0x011C);//0x011A   why need to set several times?
+        write_reg(0x00A4,0x0001);//NVM	 
+        write_reg(0x0008,0x000F);
+        write_reg(0x000A,0x0008);
+        write_reg(0x000D,0x0008);	    
+  		//伽马校正
+        write_reg(0x0030,0x0707);
+        write_reg(0x0031,0x0007); //0x0707
+        write_reg(0x0032,0x0603); 
+        write_reg(0x0033,0x0700); 
+        write_reg(0x0034,0x0202); 
+        write_reg(0x0035,0x0002); //?0x0606
+        write_reg(0x0036,0x1F0F);
+        write_reg(0x0037,0x0707); //0x0f0f  0x0105
+        write_reg(0x0038,0x0000); 
+        write_reg(0x0039,0x0000); 
+        write_reg(0x003A,0x0707); 
+        write_reg(0x003B,0x0000); //0x0303
+        write_reg(0x003C,0x0007); //?0x0707
+        write_reg(0x003D,0x0000); //0x1313//0x1f08
+        delay(50); 
+        write_reg(0x0007,0x0001);
+        write_reg(0x0017,0x0001);//开启电源
+        delay(50); 
+  		//电源配置
+        write_reg(0x0010,0x17A0); 
+        write_reg(0x0011,0x0217);//reference voltage VC[2:0]   Vciout = 1.00*Vcivl
+        write_reg(0x0012,0x011E);//0x011c  //Vreg1out = Vcilvl*1.80   is it the same as Vgama1out ?
+        write_reg(0x0013,0x0F00);//VDV[4:0]-->VCOM Amplitude VcomL = VcomH - Vcom Ampl
+        write_reg(0x002A,0x0000);  
+        write_reg(0x0029,0x000A);//0x0001F  Vcomh = VCM1[4:0]*Vreg1out    gate source voltage??
+        write_reg(0x0012,0x013E);// 0x013C  power supply on
+        //Coordinates Control//
+        write_reg(0x0050,0x0000);//0x0e00
+        write_reg(0x0051,0x00EF); 
+        write_reg(0x0052,0x0000); 
+        write_reg(0x0053,0x013F); 
+    	//Pannel Image Control//
+        write_reg(0x0060,0x2700); 
+        write_reg(0x0061,0x0001); 
+        write_reg(0x006A,0x0000); 
+        write_reg(0x0080,0x0000); 
+    	//Partial Image Control//
+        write_reg(0x0081,0x0000); 
+        write_reg(0x0082,0x0000); 
+        write_reg(0x0083,0x0000); 
+        write_reg(0x0084,0x0000); 
+        write_reg(0x0085,0x0000); 
+  		//Panel Interface Control//
+        write_reg(0x0090,0x0013);//0x0010 frenqucy
+        write_reg(0x0092,0x0300); 
+        write_reg(0x0093,0x0005); 
+        write_reg(0x0095,0x0000); 
+        write_reg(0x0097,0x0000); 
+        write_reg(0x0098,0x0000); 
+  
+        write_reg(0x0001,0x0100); 
+        write_reg(0x0002,0x0700); 
+        write_reg(0x0003,0x1038);//扫描方向 上->下  左->右 
+        write_reg(0x0004,0x0000); 
+        write_reg(0x000C,0x0000); 
+        write_reg(0x000F,0x0000); 
+        write_reg(0x0020,0x0000); 
+        write_reg(0x0021,0x0000); 
+        write_reg(0x0007,0x0021); 
+        delay(20);
+        write_reg(0x0007,0x0061); 
+        delay(20);
+        write_reg(0x0007,0x0173); 
+        delay(20);
+    }
     //数据总线测试,用于测试硬件连接是否正常.
     lcd_data_bus_test();
     //GRAM测试,此测试可以测试LCD控制器内部GRAM.测试通过保证硬件正常

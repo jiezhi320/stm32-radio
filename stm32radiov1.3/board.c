@@ -177,6 +177,24 @@ static void all_device_reset(void)
 
 }
 
+void up_mcu_show(void)
+{
+//    uint8_t * sn = (uint8_t *)0x1FFFF7E8;
+//    uint32_t i;	
+	
+	rt_kprintf("\n\r UP MCU 工作室   \r\n");
+	rt_kprintf(" 魔笛stm32 RT-thread体验平台 \r\n");
+	rt_kprintf(" QQ群：258043068   \r\n");
+	/*
+	// show SN
+    rt_kprintf("CPU SN: ");
+    for(i=0;i<12;i++)
+    {
+        rt_kprintf("%02X",*sn++);
+    }
+	*/
+   // rt_kprintf("\r\n");
+}
 /**
  * This function will initial STM32 Radio board.
  */
@@ -206,6 +224,7 @@ void rt_hw_board_init(void)
     rt_console_set_device("uart3");
 #endif
 
+	up_mcu_show();
     rt_kprintf("\r\n\r\nSystemInit......\r\n");
 
     // show SN

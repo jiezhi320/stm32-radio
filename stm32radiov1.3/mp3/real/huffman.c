@@ -383,7 +383,7 @@ int DecodeHuffman(MP3DecInfo *mp3DecInfo, unsigned char *buf, int *bitOffset, in
 	FrameHeader *fh;
 	SideInfo *si;
 	SideInfoSub *sis;
-	ScaleFactorInfo * volatile sfi;
+	ScaleFactorInfo *sfi;
 	HuffmanInfo *hi;
 
 	/* validate pointers */

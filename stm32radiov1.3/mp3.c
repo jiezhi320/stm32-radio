@@ -265,20 +265,8 @@ int mp3_decoder_run(struct mp3_decoder* decoder)
 				}
 				outputSamps *= 2;
 			}
-			else
-			{
-				int i,j,k=0;
-				for(i=0;i<(outputSamps/64);i++)
-				{
-						for(j=31+i*64,k=j+32;j>=0+i*64;j--,k-=2)
-						{
-							buffer[k]=buffer[j];
-							buffer[k-1]=buffer[j]; 
-						}
-				}
-			}	
-			        /* set sample rate */
-								/* 永久等待方式持有信号量 */
+			/* set sample rate */
+			/* 永久等待方式持有信号量 */
 			
 			result = rt_sem_take(&s_semForPlay, RT_WAITING_FOREVER);
 					
